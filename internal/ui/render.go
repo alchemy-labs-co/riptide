@@ -116,17 +116,6 @@ func (m Model) renderHeader() string {
 func (m Model) renderMessages() string {
 	var content strings.Builder
 
-	// Safe debugging - only log if we have messages
-	if len(m.messages) > 0 {
-		fmt.Printf("[DEBUG] Total messages: %d\n", len(m.messages))
-		for i, msg := range m.messages {
-			fmt.Printf("[DEBUG] Message %d: Role=%s, Content length=%d\n", i, msg.Role, len(msg.Content))
-			if msg.Role == "reasoning" || msg.Role == "reasoning-label" {
-				fmt.Printf("[DEBUG] Found reasoning token at index %d\n", i)
-			}
-		}
-	}
-
 	for _, msg := range m.messages {
 		switch msg.Role {
 		case "user":
@@ -141,7 +130,8 @@ func (m Model) renderMessages() string {
 		case "assistant-label":
 			// White dot for output tokens
 			whiteDot := lipgloss.NewStyle().Foreground(WhiteColor).Render("●")
-			content.WriteString(fmt.Sprintf("\n%s %s\n",
+			// Add extra newline before assistant label for spacing
+			content.WriteString(fmt.Sprintf("\n\n%s %s\n",
 				whiteDot,
 				AssistantLabelStyle.Render("Assistant>"),
 			))
@@ -149,7 +139,8 @@ func (m Model) renderMessages() string {
 		case "reasoning-label":
 			// Blue dot for reasoning tokens
 			blueDot := lipgloss.NewStyle().Foreground(SecondaryColor).Render("●")
-			content.WriteString(fmt.Sprintf("\n%s %s\n",
+			// Add extra newline before reasoning label for spacing
+			content.WriteString(fmt.Sprintf("\n\n%s %s\n",
 				blueDot,
 				ReasoningLabelStyle.Render("Reasoning:"),
 			))
@@ -157,10 +148,11 @@ func (m Model) renderMessages() string {
 		case "content":
 			// Apply markdown rendering to content
 			renderedContent := renderMarkdown(msg.Content)
-			// Apply padding to each line
+			// Apply padding to each line to align with labels
 			lines := strings.Split(renderedContent, "\n")
 			for _, line := range lines {
-				content.WriteString(ContentStyle.Render(line))
+				// Add spacing to align content with the label text
+				content.WriteString("  " + line)
 				content.WriteString("\n")
 			}
 
@@ -168,10 +160,10 @@ func (m Model) renderMessages() string {
 			// Show reasoning content with different styling
 			lines := strings.Split(msg.Content, "\n")
 			for _, line := range lines {
+				// Add spacing to align content with the label text
 				content.WriteString(lipgloss.NewStyle().
 					Foreground(lipgloss.Color("#60a5fa")).
-					PaddingLeft(2).
-					Render(line))
+					Render("  " + line))
 				content.WriteString("\n")
 			}
 

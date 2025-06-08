@@ -562,10 +562,22 @@ func (m Model) handleStreamEvent(event api.StreamEvent) (tea.Model, tea.Cmd) {
 			m.isReasoning = false
 			m.finalizeCurrentMessage()
 			m.addAssistantLabel()
+			// Add empty content message immediately after assistant label
+			m.messages = append(m.messages, Message{
+				Role:      "content",
+				Content:   "",
+				Timestamp: time.Now(),
+			})
 		} else if !m.hasContent {
 			// First content, remove seeking indicator
 			m.removeSeekingIndicator()
 			m.addAssistantLabel()
+			// Add empty content message immediately after assistant label
+			m.messages = append(m.messages, Message{
+				Role:      "content",
+				Content:   "",
+				Timestamp: time.Now(),
+			})
 		}
 		m.currentContent += event.Content
 		m.accumulatedContent += event.Content
