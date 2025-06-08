@@ -1,4 +1,4 @@
-# Deep Code
+# Riptide
 
 A powerful AI coding assistant powered by DeepSeek's reasoning models, featuring a beautiful terminal UI built with Bubble Tea.
 
@@ -26,15 +26,15 @@ A powerful AI coding assistant powered by DeepSeek's reasoning models, featuring
 ### From Source
 
 ```bash
-git clone https://github.com/yourusername/deep-code.git
-cd deep-code
+git clone https://github.com/alchemy-labs-co/riptide.git
+cd riptide
 make build
 ```
 
 ### Using Go Install
 
 ```bash
-go install github.com/yourusername/deep-code@latest
+go install github.com/alchemy-labs-co/riptide@latest
 ```
 
 ## Configuration
@@ -85,7 +85,7 @@ Create a `config.json` file (optional):
 ### Basic Usage
 
 ```bash
-./deep-code
+./riptide
 ```
 
 ### Commands
@@ -104,7 +104,7 @@ Create a `config.json` file (optional):
 1. Start the application:
 
    ```bash
-   ./deep-code
+   ./riptide
    ```
 
 2. Add files to context:
@@ -128,7 +128,7 @@ Create a `config.json` file (optional):
 
 ## Function Capabilities
 
-Deep Code can perform the following file operations:
+Riptide can perform the following file operations:
 
 - **read_file** - Read a single file's content
 - **read_multiple_files** - Read multiple files at once
@@ -139,7 +139,7 @@ Deep Code can perform the following file operations:
 ## Architecture
 
 ```
-deep-code/
+riptide/
 ├── main.go                 # Entry point
 ├── internal/
 │   ├── api/               # DeepSeek API client
@@ -163,7 +163,7 @@ deep-code/
 ├── docs/                   # Documentation
 │   ├── DEVELOPMENT_NOTES.md # Architectural decisions and lessons
 │   └── TASKS.md           # Feature and bug tracking
-├── .deepcode/             # Deep Code specific settings
+├── .riptide/             # Riptide specific settings
 │   ├── settings.json      # Project settings
 │   ├── AGENTS.md          # Agent definitions
 │   └── projects/          # Sub-project configurations
@@ -264,15 +264,11 @@ make clean
 
 MIT License - see [LICENSE](LICENSE) file for details.
 
+“”
+
 ## Acknowledgments
 
 - [DeepSeek](https://deepseek.com) for the amazing reasoning models
 - [Charm](https://charm.sh) for the beautiful TUI libraries
 - [sashabaranov/go-openai](https://github.com/sashabaranov/go-openai) for the OpenAI client
 - Original [deepseek-engineer](https://github.com/ruvnet/deepseek-engineer) Python implementation
-
-## Related Projects
-
-- [deepseek-engineer](https://github.com/ruvnet/deepseek-engineer) - Original Python implementation
-- [continue.dev](https://continue.dev) - VS Code AI assistant
-- [aider](https://github.com/paul-gauthier/aider) - AI pair programming tool

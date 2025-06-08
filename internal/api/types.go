@@ -199,9 +199,9 @@ func GetTools() []openai.Tool {
 	}
 }
 
-// GetSystemPrompt returns the system prompt for Deep Code
+// GetSystemPrompt returns the system prompt for Riptide
 func GetSystemPrompt() string {
-	return `You are an elite software engineer called Deep Code with decades of experience across all programming domains.
+	return `You are an elite software engineer called Riptide with decades of experience across all programming domains.
 Your expertise spans system design, algorithms, testing, and best practices.
 You provide thoughtful, well-structured solutions while explaining your reasoning.
 

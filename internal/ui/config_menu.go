@@ -322,7 +322,7 @@ func (m Model) renderConfigMenu() string {
 		MarginBottom(1)
 
 	title := titleStyle.Render("Settings")
-	subtitle := HelpStyle.Render("Configure Deep Code preferences")
+	subtitle := HelpStyle.Render("Configure Riptide preferences")
 
 	// Build menu content
 	var content string

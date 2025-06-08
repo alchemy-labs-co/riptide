@@ -11,10 +11,10 @@ import (
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/deep-code/deep-code/internal/api"
-	"github.com/deep-code/deep-code/internal/config"
-	"github.com/deep-code/deep-code/internal/conversation"
-	"github.com/deep-code/deep-code/internal/functions"
+	"github.com/alchemy-labs-co/riptide/internal/api"
+	"github.com/alchemy-labs-co/riptide/internal/config"
+	"github.com/alchemy-labs-co/riptide/internal/conversation"
+	"github.com/alchemy-labs-co/riptide/internal/functions"
 )
 
 // Command represents a slash command with its description

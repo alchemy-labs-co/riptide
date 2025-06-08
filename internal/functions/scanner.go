@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/deep-code/deep-code/internal/config"
+	"github.com/alchemy-labs-co/riptide/internal/config"
 )
 
 // ScanResult represents the result of scanning a directory

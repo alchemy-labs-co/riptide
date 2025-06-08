@@ -7,7 +7,7 @@ import (
 	"io"
 	"time"
 
-	"github.com/deep-code/deep-code/internal/config"
+	"github.com/alchemy-labs-co/riptide/internal/config"
 	openai "github.com/sashabaranov/go-openai"
 )
 
@@ -104,9 +104,12 @@ func (c *Client) CreateChatCompletionStream(ctx context.Context, messages []open
 				delta := choice.Delta
 
 				// Handle reasoning content if available
-				// Note: The standard go-openai library doesn't have ReasoningContent field
-				// For now, we'll skip reasoning display until we extend the library
-				// TODO: Fork go-openai to add DeepSeek-specific fields
+				if delta.ReasoningContent != "" {
+					eventChan <- StreamEvent{
+						Type:             EventTypeReasoning,
+						ReasoningContent: delta.ReasoningContent,
+					}
+				}
 
 				// Handle regular content
 				if delta.Content != "" {

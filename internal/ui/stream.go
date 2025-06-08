@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/deep-code/deep-code/internal/api"
+	"github.com/alchemy-labs-co/riptide/internal/api"
 )
 
 // StreamManager handles the streaming integration between API and UI

@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/charmbracelet/lipgloss"
-	"github.com/deep-code/deep-code/internal/conversation"
+	"github.com/alchemy-labs-co/riptide/internal/conversation"
 )
 
 // renderWelcome renders the welcome screen
@@ -39,7 +39,7 @@ func (m Model) renderWelcome() string {
 	// Create header with welcome message
 	headerContent := fmt.Sprintf("%s Welcome to %s!",
 		GetIcon("whale", enableEmoji),
-		lipgloss.NewStyle().Bold(true).Render("Deep Code"),
+		lipgloss.NewStyle().Bold(true).Render("Riptide"),
 	)
 
 	// Create subtitle
@@ -108,7 +108,7 @@ func (m Model) renderWelcome() string {
 // renderHeader renders the header
 func (m Model) renderHeader() string {
 	enableEmoji := m.config.UI.EnableEmoji
-	title := fmt.Sprintf("%s Deep Code", GetIcon("whale", enableEmoji))
+	title := fmt.Sprintf("%s Riptide", GetIcon("whale", enableEmoji))
 	return TitleStyle.Render(title)
 }
 
@@ -116,9 +116,16 @@ func (m Model) renderHeader() string {
 func (m Model) renderMessages() string {
 	var content strings.Builder
 
-	// Log out the message type for debugging
-	fmt.Println("Message type:", m.messages[0].Role)
-	fmt.Println("Message Metadata:", m.messages[0])
+	// Safe debugging - only log if we have messages
+	if len(m.messages) > 0 {
+		fmt.Printf("[DEBUG] Total messages: %d\n", len(m.messages))
+		for i, msg := range m.messages {
+			fmt.Printf("[DEBUG] Message %d: Role=%s, Content length=%d\n", i, msg.Role, len(msg.Content))
+			if msg.Role == "reasoning" || msg.Role == "reasoning-label" {
+				fmt.Printf("[DEBUG] Found reasoning token at index %d\n", i)
+			}
+		}
+	}
 
 	for _, msg := range m.messages {
 		switch msg.Role {
@@ -359,7 +366,7 @@ func (m Model) renderInput() string {
 func (m Model) getHelpText() string {
 	enableEmoji := m.config.UI.EnableEmoji
 
-	return fmt.Sprintf(`%s Deep Code Help
+	return fmt.Sprintf(`%s Riptide Help
 
 %s Commands:
   /add <path>     - Add file or directory to conversation context
@@ -367,7 +374,7 @@ func (m Model) getHelpText() string {
   /config         - Configure settings
   /help           - Show this help message
   /status         - Show current configuration and pricing info
-  exit/quit       - Exit the application
+  quit (exit)     - Exit the application
   Ctrl+C          - Force quit
   Ctrl+D          - Quit (when ready)
   PgUp/PgDown     - Scroll conversation
@@ -455,7 +462,7 @@ func (m Model) getStatusText() string {
 └ Messages: %d
 └ Tokens: %d input, %d output, %d cached
 └ Cost: $%.4f`,
-		"Deep Code Status v1.0.0",
+		"Riptide Status v1.0.0",
 		headerStyle.Render("Working Directory"),
 		cwd,
 		headerStyle.Render("Time • "+localTime),

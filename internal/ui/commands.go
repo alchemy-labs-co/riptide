@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/deep-code/deep-code/internal/functions"
+	"github.com/alchemy-labs-co/riptide/internal/functions"
 )
 
 // handleAddCommand handles the /add command to add files or directories to context

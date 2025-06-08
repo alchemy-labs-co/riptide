@@ -5,8 +5,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/deep-code/deep-code/internal/api"
-	"github.com/deep-code/deep-code/internal/config"
+	"github.com/alchemy-labs-co/riptide/internal/api"
+	"github.com/alchemy-labs-co/riptide/internal/config"
 	openai "github.com/sashabaranov/go-openai"
 )
 

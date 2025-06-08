@@ -6,8 +6,8 @@ import (
 	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/deep-code/deep-code/internal/config"
-	"github.com/deep-code/deep-code/internal/ui"
+	"github.com/alchemy-labs-co/riptide/internal/config"
+	"github.com/alchemy-labs-co/riptide/internal/ui"
 )
 
 func main() {
@@ -20,7 +20,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "2. config.json exists (optional)\n")
 		fmt.Fprintf(os.Stderr, "\nExample:\n")
 		fmt.Fprintf(os.Stderr, "  export DEEPSEEK_API_KEY=your_api_key_here\n")
-		fmt.Fprintf(os.Stderr, "  ./deep-code\n")
+		fmt.Fprintf(os.Stderr, "  ./riptide\n")
 		os.Exit(1)
 	}
 
@@ -52,7 +52,7 @@ var (
 func init() {
 	// Handle version flag
 	if len(os.Args) > 1 && (os.Args[1] == "--version" || os.Args[1] == "-v") {
-		fmt.Printf("Deep Code (Go implementation)\n")
+		fmt.Printf("Riptide\n")
 		fmt.Printf("Version: %s\n", version)
 		fmt.Printf("Commit: %s\n", commit)
 		fmt.Printf("Built: %s\n", date)
@@ -61,10 +61,10 @@ func init() {
 
 	// Handle help flag
 	if len(os.Args) > 1 && (os.Args[1] == "--help" || os.Args[1] == "-h") {
-		fmt.Println("Deep Code - AI-powered coding assistant")
+		fmt.Println("Riptide - AI-powered coding assistant")
 		fmt.Println()
 		fmt.Println("Usage:")
-		fmt.Println("  deep-code [options]")
+		fmt.Println("  riptide [options]")
 		fmt.Println()
 		fmt.Println("Options:")
 		fmt.Println("  -h, --help     Show this help message")

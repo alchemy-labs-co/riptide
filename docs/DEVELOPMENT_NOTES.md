@@ -1,4 +1,4 @@
-# Deep Code Development Notes
+# Riptide Development Notes
 
 This document contains important lessons learned, architectural decisions, and implementation quirks discovered during development.
 
@@ -273,7 +273,7 @@ import "github.com/charmbracelet/lipgloss"
 
 1. **Temporary Status Messages**: Use `ProcessCompleteMsg`
 2. **State Tracking**: Add debug fields temporarily
-3. **Build Frequently**: `go build -o deep-code main.go`
+3. **Build Frequently**: `go build -o riptide main.go`
 4. **Test Edge Cases**: Empty input, long text, rapid commands
 
 ## Code Style Guidelines

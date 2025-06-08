@@ -1,4 +1,4 @@
-module github.com/deep-code/deep-code
+module github.com/alchemy-labs-co/riptide
 
 go 1.22
 

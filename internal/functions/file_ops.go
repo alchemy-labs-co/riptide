@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/deep-code/deep-code/internal/api"
-	"github.com/deep-code/deep-code/internal/config"
+	"github.com/alchemy-labs-co/riptide/internal/api"
+	"github.com/alchemy-labs-co/riptide/internal/config"
 )
 
 // FileOperations handles all file-related operations

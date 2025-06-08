@@ -1,6 +1,6 @@
-# Contributing to Deep Code (Go)
+# Contributing to Riptide
 
-Thank you for your interest in contributing to Deep Code! This guide will help you get started with contributing to the project.
+Thank you for your interest in contributing to Riptide! This guide will help you get started with contributing to the project.
 
 ## Table of Contents
 
@@ -28,12 +28,12 @@ This project adheres to a Code of Conduct that all contributors are expected to 
 1. **Fork the repository** on GitHub
 2. **Clone your fork** locally:
    ```bash
-   git clone https://github.com/yourusername/deep-code.git
-   cd deep-code
+   git clone https://github.com/alchemy-labs-co/riptide.git
+   cd riptide
    ```
 3. **Add upstream remote**:
    ```bash
-   git remote add upstream https://github.com/originalrepo/deep-code.git
+   git remote add upstream https://github.com/alchemy-labs-co/riptide.git
    ```
 
 ## Development Setup
@@ -103,7 +103,7 @@ go install mvdan.cc/gofumpt@latest
 
 ### Finding Issues
 
-- Check the [Issues](https://github.com/originalrepo/deep-code/issues) page
+- Check the [Issues](https://github.com/alchemy-labs-co/riptide/issues) page
 - Look for issues labeled `good first issue` or `help wanted`
 - Ask in discussions if you want to work on something specific
 
@@ -209,7 +209,7 @@ We follow standard Go conventions with some additional guidelines:
 ### Project Structure
 
 ```
-deep-code/
+riptide/
 ├── main.go                # Entry point - initializes TUI program
 ├── internal/
 │   ├── api/              # DeepSeek API integration
@@ -233,7 +233,7 @@ deep-code/
 ├── docs/
 │   ├── DEVELOPMENT_NOTES.md # Implementation lessons and patterns
 │   └── TASKS.md            # Feature/bug tracking
-└── .deepcode/              # Project-specific settings
+└── .riptide/              # Project-specific settings
 ```
 
 Keep code organized in the appropriate packages. Refer to `docs/DEVELOPMENT_NOTES.md` for implementation patterns and lessons learned.
@@ -390,8 +390,8 @@ Closes #123
 
 ## License
 
-By contributing to Deep Code, you agree that your contributions will be licensed under the MIT License.
+By contributing to Riptide, you agree that your contributions will be licensed under the MIT License.
 
 ---
 
-Thank you for contributing to Deep Code! Your efforts help make this tool better for everyone. 🚀
+Thank you for contributing to Riptide! Your efforts help make this tool better for everyone. 🚀

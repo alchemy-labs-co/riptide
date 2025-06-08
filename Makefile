@@ -1,5 +1,5 @@
-# Deep Code Go Implementation
-BINARY_NAME=deep-code
+# Riptide Go Implementation
+BINARY_NAME=riptide
 VERSION=$(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
 COMMIT=$(shell git rev-parse --short HEAD 2>/dev/null || echo "none")
 DATE=$(shell date -u '+%Y-%m-%d_%H:%M:%S')
@@ -121,7 +121,7 @@ setup: deps
 
 # Help
 help:
-	@echo "Deep Code - Go Implementation"
+	@echo "Riptide - Go Implementation"
 	@echo ""
 	@echo "Available targets:"
 	@echo "  make build       - Build the binary"
