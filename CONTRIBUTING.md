@@ -52,10 +52,10 @@ This project adheres to a Code of Conduct that all contributors are expected to 
    go mod download
    ```
 
-2. **Copy environment template**:
+2. **Set your DeepSeek API key**:
    ```bash
-   cp .env.example .env
-   # Add your DEEPSEEK_API_KEY to .env
+   export DEEPSEEK_API_KEY=your_api_key_here
+   # Or create a config.json file with your settings
    ```
 
 3. **Run tests**:
@@ -82,6 +82,13 @@ go install github.com/cosmtrek/air@latest
 # Install gofumpt for stricter formatting
 go install mvdan.cc/gofumpt@latest
 ```
+
+### Important Development Notes
+
+- **Never use `strings.Builder` in Bubble Tea models** - causes panics due to copy-by-value
+- **Avoid `log.Printf` in TUI code** - corrupts terminal display
+- **Use predefined styles from `styles.go`** - ensures consistency
+- **Read `docs/DEVELOPMENT_NOTES.md`** - contains critical implementation lessons
 
 ## How to Contribute
 
@@ -202,15 +209,80 @@ We follow standard Go conventions with some additional guidelines:
 ### Project Structure
 
 ```
-internal/
-├── api/          # API client code
-├── config/       # Configuration handling
-├── conversation/ # Conversation management
-├── functions/    # File operation functions
-└── ui/           # Terminal UI components
+deep-code/
+├── main.go                # Entry point - initializes TUI program
+├── internal/
+│   ├── api/              # DeepSeek API integration
+│   │   ├── client.go     # OpenAI-compatible client wrapper
+│   │   └── types.go      # API request/response types
+│   ├── config/           # Configuration handling
+│   │   └── config.go     # Config loading, validation, defaults
+│   ├── conversation/     # Conversation management
+│   │   └── history.go    # Message history and token tracking
+│   ├── functions/        # File operation functions
+│   │   ├── file_ops.go   # Read/write/edit operations
+│   │   ├── scanner.go    # Directory scanning with patterns
+│   │   └── security.go   # Path validation and limits
+│   └── ui/               # Terminal UI (Bubble Tea)
+│       ├── model.go      # MVC model and state management
+│       ├── render.go     # Rendering logic for all components
+│       ├── styles.go     # Centralized lipgloss styles
+│       ├── stream.go     # Stream processing and updates
+│       ├── commands.go   # Command definitions and autocomplete
+│       └── config_menu.go # Interactive configuration menu
+├── docs/
+│   ├── DEVELOPMENT_NOTES.md # Implementation lessons and patterns
+│   └── TASKS.md            # Feature/bug tracking
+└── .deepcode/              # Project-specific settings
 ```
 
-Keep code organized in the appropriate packages.
+Keep code organized in the appropriate packages. Refer to `docs/DEVELOPMENT_NOTES.md` for implementation patterns and lessons learned.
+
+## Key Implementation Patterns
+
+### UI State Management
+
+The project uses Bubble Tea's Model-View-Update (MVU) pattern:
+
+```go
+// Model holds all application state
+type Model struct {
+    messages       []Message
+    viewport       viewport.Model
+    textInput      textinput.Model
+    // ... other state fields
+}
+
+// Update handles all state changes
+func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd)
+
+// View renders the UI based on current state
+func (m Model) View() string
+```
+
+### Command Autocomplete
+
+The autocomplete system provides smart suggestions:
+- Shows dropdown with matching commands
+- Highlights selected option with DeepSeek blue (#00d4ff)
+- Tab/Enter fills command with space
+- Escape cancels autocomplete
+
+### Configuration Menu
+
+Interactive settings adjustment (`/config`):
+- Full-screen overlay with centered content
+- Arrow key navigation
+- Enter/Tab/Space cycles through values
+- Shows confirmation of changes
+
+### Streaming Responses
+
+Handle DeepSeek API streaming with proper state management:
+1. Show "Seeking..." indicator
+2. Process reasoning and content separately
+3. Update token usage in real-time
+4. Support stream cancellation with Ctrl+C
 
 ## Testing
 

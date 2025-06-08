@@ -1,4 +1,4 @@
-# Deep Code (Go)
+# Deep Code
 
 A powerful AI coding assistant powered by DeepSeek's reasoning models, featuring a beautiful terminal UI built with Bubble Tea.
 
@@ -92,30 +92,36 @@ Create a `config.json` file (optional):
 
 - `/add <path>` - Add a file or directory to the conversation context
 - `/clear` - Clear the conversation history
+- `/config` - Open configuration menu to adjust settings
 - `/help` - Show help information
-- `exit` or `quit` - Exit the application
-- `Ctrl+C` - Force quit
+- `quit` - Exit the application
+- `Ctrl+C` - Cancel streaming or force quit
 - `PgUp/PgDown` - Scroll conversation history
+- `↑/↓` - Navigate autocomplete suggestions (when typing commands)
 
 ### Example Workflow
 
 1. Start the application:
+
    ```bash
    ./deep-code
    ```
 
 2. Add files to context:
+
    ```
    /add main.go
    /add src/
    ```
 
 3. Ask questions or request changes:
+
    ```
    Can you help me optimize the database queries in this code?
    ```
 
 4. The AI can directly read and modify files:
+
    ```
    Please add error handling to the fetchUser function
    ```
@@ -137,11 +143,33 @@ deep-code/
 ├── main.go                 # Entry point
 ├── internal/
 │   ├── api/               # DeepSeek API client
+│   │   ├── client.go      # API client implementation
+│   │   └── types.go       # API type definitions
 │   ├── config/            # Configuration management
+│   │   └── config.go      # Config loading and validation
 │   ├── conversation/      # Conversation history
+│   │   └── history.go     # Token tracking and history management
 │   ├── functions/         # File operations
+│   │   ├── file_ops.go    # File read/write operations
+│   │   ├── scanner.go     # Directory scanning utilities
+│   │   └── security.go    # Path validation and security
 │   └── ui/                # Terminal UI components
-├── config.json            # Configuration file
+│       ├── model.go       # Core state management (MVC pattern)
+│       ├── render.go      # UI rendering logic
+│       ├── styles.go      # Centralized styling definitions
+│       ├── stream.go      # Stream handling and updates
+│       ├── commands.go    # Command definitions and autocomplete
+│       └── config_menu.go # Configuration menu implementation
+├── docs/                   # Documentation
+│   ├── DEVELOPMENT_NOTES.md # Architectural decisions and lessons
+│   └── TASKS.md           # Feature and bug tracking
+├── .deepcode/             # Deep Code specific settings
+│   ├── settings.json      # Project settings
+│   ├── AGENTS.md          # Agent definitions
+│   └── projects/          # Sub-project configurations
+├── config.json            # Configuration file (optional)
+├── go.mod                 # Go module definition
+├── go.sum                 # Go dependencies lock file
 └── Makefile              # Build automation
 ```
 
@@ -166,6 +194,7 @@ deep-code/
 This Go implementation maintains **complete feature parity** with the original Python version:
 
 ### ✅ Core Features
+
 - [x] DeepSeek API integration with streaming
 - [x] Chain-of-thought reasoning display
 - [x] All 5 file operation functions
@@ -176,6 +205,7 @@ This Go implementation maintains **complete feature parity** with the original P
 - [x] File security and validation
 
 ### ✅ UI Features
+
 - [x] Real-time streaming display
 - [x] Colored output and formatting
 - [x] Emoji support (configurable)
@@ -184,11 +214,15 @@ This Go implementation maintains **complete feature parity** with the original P
 - [x] Token and cost tracking
 
 ### ✅ Additional Features in Go Version
+
 - [x] **Single binary distribution** - No Python/dependencies needed
 - [x] **Better performance** - Compiled language advantages
 - [x] **Type safety** - Compile-time error checking
 - [x] **Concurrent operations** - Leverages Go's goroutines
 - [x] **Modern TUI** - Reactive UI with Bubble Tea
+- [x] **Command Autocomplete** - Smart command suggestions with dropdown
+- [x] **Configuration Menu** - Interactive settings adjustment via `/config`
+- [x] **Off-Peak Pricing** - Automatic cost calculation with 75% discount during off-peak hours
 
 ## Building
 
@@ -211,6 +245,7 @@ make clean
 ### Common Issues
 
 1. **API Key Not Found**
+
    ```bash
    export DEEPSEEK_API_KEY=your_api_key_here
    ```
