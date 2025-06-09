@@ -115,6 +115,7 @@ func (m Model) renderHeader() string {
 // renderMessages renders all messages
 func (m Model) renderMessages() string {
 	var content strings.Builder
+	var lastRole string
 
 	for _, msg := range m.messages {
 		switch msg.Role {
@@ -128,21 +129,18 @@ func (m Model) renderMessages() string {
 			))
 
 		case "assistant-label":
-			// White dot for output tokens
+			// White dot for output tokens - no label text
 			whiteDot := lipgloss.NewStyle().Foreground(WhiteColor).Render("●")
-			// Add extra newline before assistant label for spacing
-			content.WriteString(fmt.Sprintf("\n\n%s %s\n",
-				whiteDot,
-				AssistantLabelStyle.Render("Assistant>"),
-			))
+			// Add extra newline before assistant for spacing
+			content.WriteString(fmt.Sprintf("\n\n%s ", whiteDot))
 
 		case "reasoning-label":
 			// Blue dot for reasoning tokens
-			blueDot := lipgloss.NewStyle().Foreground(SecondaryColor).Render("●")
-			// Add extra newline before reasoning label for spacing
+			blueDot := lipgloss.NewStyle().Foreground(lipgloss.Color("#60a5fa")).Render("●")
+			// Add extra newline before thinking label for spacing
 			content.WriteString(fmt.Sprintf("\n\n%s %s\n",
 				blueDot,
-				ReasoningLabelStyle.Render("Reasoning:"),
+				ReasoningLabelStyle.Render("Thinking..."),
 			))
 
 		case "content":
@@ -150,20 +148,25 @@ func (m Model) renderMessages() string {
 			renderedContent := renderMarkdown(msg.Content)
 			// Apply padding to each line to align with labels
 			lines := strings.Split(renderedContent, "\n")
-			for _, line := range lines {
-				// Add spacing to align content with the label text
-				content.WriteString("  " + line)
+			for i, line := range lines {
+				if i == 0 && lastRole == "assistant-label" {
+					// First line after assistant label - no padding, continues on same line
+					content.WriteString(line)
+				} else {
+					// Subsequent lines or content not after assistant label
+					content.WriteString("  " + line)
+				}
 				content.WriteString("\n")
 			}
 
 		case "reasoning":
-			// Show reasoning content with different styling
+			// Show reasoning content with consistent blue styling
 			lines := strings.Split(msg.Content, "\n")
 			for _, line := range lines {
 				// Add spacing to align content with the label text
-				content.WriteString(lipgloss.NewStyle().
-					Foreground(lipgloss.Color("#60a5fa")).
-					Render("  " + line))
+				// Apply style to the entire padded line to ensure consistent coloring
+				paddedLine := "  " + line
+				content.WriteString(ReasoningContentStyle.Render(paddedLine))
 				content.WriteString("\n")
 			}
 
@@ -172,18 +175,12 @@ func (m Model) renderMessages() string {
 
 		case "error":
 			content.WriteString(fmt.Sprintf("\n%s\n", ErrorStyle.Render(msg.Content)))
-
-		case "seeking":
-			// Show animated seeking indicator
-			enableEmoji := m.config.UI.EnableEmoji
-			whale := GetIcon("whale", enableEmoji)
-			content.WriteString(fmt.Sprintf("\n%s %s %s\n",
-				whale,
-				m.spinner.View(),
-				InfoStyle.Render("Seeking..."),
-			))
 		}
+		lastRole = msg.Role
 	}
+
+	// Add bottom padding to ensure content is visible when scrolled to bottom
+	content.WriteString("\n\n\n\n\n")
 
 	return content.String()
 }
@@ -260,21 +257,14 @@ func (m Model) renderInput() string {
 	// Use a blue triangle instead of "You"
 	prompt := lipgloss.NewStyle().Foreground(SecondaryColor).Render("▶ ")
 
-	if m.state != StateReady {
-		inputContent := prompt + HelpStyle.Render("(waiting...)")
-		// Create input box with full width
-		return lipgloss.NewStyle().
-			Border(lipgloss.RoundedBorder()).
-			BorderForeground(SecondaryColor).
-			Padding(0, 1).
-			Width(m.width - 2).
-			Render(inputContent)
-	}
-
-	// Get current input and build content
-	currentValue := m.textInput.Value()
 	var inputContent string
-	cursorPos := m.textInput.Position()
+	
+	if m.state != StateReady {
+		inputContent = prompt + HelpStyle.Render("(waiting...)")
+	} else {
+		// Get current input and build content
+		currentValue := m.textInput.Value()
+		cursorPos := m.textInput.Position()
 
 	// Add autocomplete suggestion if active
 	if m.autocompleteActive && m.autocompleteSuggestion != "" {
@@ -311,6 +301,7 @@ func (m Model) renderInput() string {
 			cursor := lipgloss.NewStyle().Background(WhiteColor).Foreground(lipgloss.Color("#000000")).Render(" ")
 			inputContent = prompt + currentValue + cursor
 		}
+	}
 	}
 
 	// Create input box with full width

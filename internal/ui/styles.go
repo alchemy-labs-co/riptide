@@ -70,6 +70,9 @@ var (
 	ReasoningLabelStyle = lipgloss.NewStyle().
 				Bold(true).
 				Foreground(lipgloss.Color("#60a5fa"))
+	
+	ReasoningContentStyle = lipgloss.NewStyle().
+				Foreground(lipgloss.Color("#60a5fa"))
 
 	// Status styles
 	SuccessStyle = lipgloss.NewStyle().

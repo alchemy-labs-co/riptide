@@ -188,7 +188,19 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.width = msg.Width
 		m.height = msg.Height
 		m.viewport.Width = msg.Width - 4
-		m.viewport.Height = msg.Height - 8
+		// Calculate dynamic footer height
+		// Header: 2 lines (title + spacing)
+		// Status line: 1 line
+		// Input box: 3 lines (border + content + status)
+		// Status text below input: 1 line
+		// Autocomplete dropdown: variable (up to 5 lines)
+		// Extra padding: 3 lines for safety
+		footerHeight := 10
+		if m.autocompleteActive && len(m.autocompleteMatches) > 0 {
+			// Add lines for dropdown + hint
+			footerHeight += min(len(m.autocompleteMatches), 5) + 2
+		}
+		m.viewport.Height = msg.Height - footerHeight
 		m.textInput.Width = msg.Width - 4
 		return m, nil
 
@@ -251,8 +263,8 @@ func (m Model) View() string {
 
 	var content strings.Builder
 
-	// Show welcome screen on first run
-	if m.showWelcome {
+	// Show welcome screen on first run only if no messages
+	if m.showWelcome && len(m.messages) == 0 {
 		content.WriteString(m.renderWelcome())
 		content.WriteString("\n\n")
 	}
@@ -488,8 +500,7 @@ func (m Model) startConversation(input string) (tea.Model, tea.Cmd) {
 	m.accumulatedContent = ""
 	m.hasContent = false
 
-	// Add seeking indicator
-	m.addSeekingIndicator()
+	// Don't add seeking indicator to messages - it's shown in status area
 
 	// Create context for streaming
 	ctx, cancel := context.WithCancel(context.Background())
@@ -551,8 +562,14 @@ func (m Model) handleStreamEvent(event api.StreamEvent) (tea.Model, tea.Cmd) {
 	case api.EventTypeReasoning:
 		if !m.isReasoning {
 			m.isReasoning = true
-			m.removeSeekingIndicator()
+			// Seeking status is shown in input area, no need to remove from messages
 			m.addReasoningLabel()
+			// Add empty reasoning message immediately after label
+			m.messages = append(m.messages, Message{
+				Role:      "reasoning",
+				Content:   "",
+				Timestamp: time.Now(),
+			})
 		}
 		m.currentContent += event.ReasoningContent
 		m.updateCurrentMessage()
@@ -561,6 +578,7 @@ func (m Model) handleStreamEvent(event api.StreamEvent) (tea.Model, tea.Cmd) {
 		if m.isReasoning {
 			m.isReasoning = false
 			m.finalizeCurrentMessage()
+			m.currentContent = "" // Reset current content after finalizing reasoning
 			m.addAssistantLabel()
 			// Add empty content message immediately after assistant label
 			m.messages = append(m.messages, Message{
@@ -570,7 +588,7 @@ func (m Model) handleStreamEvent(event api.StreamEvent) (tea.Model, tea.Cmd) {
 			})
 		} else if !m.hasContent {
 			// First content, remove seeking indicator
-			m.removeSeekingIndicator()
+			// Seeking status is shown in input area, no need to remove from messages
 			m.addAssistantLabel()
 			// Add empty content message immediately after assistant label
 			m.messages = append(m.messages, Message{
@@ -697,18 +715,11 @@ func (m *Model) addErrorMessage(content string) {
 }
 
 func (m *Model) addSeekingIndicator() {
-	m.messages = append(m.messages, Message{
-		Role:      "seeking",
-		Content:   "",
-		Timestamp: time.Now(),
-	})
+	// No longer add seeking message - status is shown in input area
 }
 
 func (m *Model) removeSeekingIndicator() {
-	// Remove the last seeking message if present
-	if len(m.messages) > 0 && m.messages[len(m.messages)-1].Role == "seeking" {
-		m.messages = m.messages[:len(m.messages)-1]
-	}
+	// No longer needed - seeking status is shown in input area
 }
 
 func (m *Model) updateCurrentMessage() {
@@ -723,6 +734,7 @@ func (m *Model) updateCurrentMessage() {
 	}
 
 	// Find the last message with the same role and update it
+	// Since we're accumulating content, we always update the most recent matching message
 	for i := len(m.messages) - 1; i >= 0; i-- {
 		if m.messages[i].Role == messageRole {
 			m.messages[i].Content = m.currentContent
@@ -751,7 +763,7 @@ func (m *Model) updateViewport() {
 	// Only auto-scroll if we're already at or near the bottom
 	// This preserves the user's scroll position if they've scrolled up
 	atBottom := m.viewport.AtBottom()
-	nearBottom := m.viewport.YOffset >= (m.viewport.TotalLineCount() - m.viewport.Height - 5)
+	nearBottom := m.viewport.YOffset >= (m.viewport.TotalLineCount() - m.viewport.Height - 10)
 
 	// Update the content
 	content := m.renderMessages()
@@ -793,6 +805,7 @@ func (m *Model) updateAutocomplete() {
 	}
 
 	// Update state based on matches
+	wasActive := m.autocompleteActive
 	if len(m.autocompleteMatches) > 0 {
 		m.autocompleteActive = true
 		// Ensure selected index is valid
@@ -808,4 +821,22 @@ func (m *Model) updateAutocomplete() {
 		m.autocompleteCommand = nil
 		m.autocompleteSelectedIndex = 0
 	}
+	
+	// If autocomplete state changed, update viewport height
+	if wasActive != m.autocompleteActive && m.height > 0 {
+		footerHeight := 10
+		if m.autocompleteActive && len(m.autocompleteMatches) > 0 {
+			// Add lines for dropdown + hint
+			footerHeight += min(len(m.autocompleteMatches), 5) + 2
+		}
+		m.viewport.Height = m.height - footerHeight
+	}
+}
+
+// min returns the minimum of two integers
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }
