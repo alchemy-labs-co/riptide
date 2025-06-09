@@ -320,6 +320,104 @@ import "github.com/charmbracelet/lipgloss"
 3. Binary file detection
 4. No API key exposure in logs
 
+## 11. Terminal UI Message Ordering and Rendering
+
+### Critical Lessons from Message Display Bugs
+
+#### Problem 1: Seeking Animation Freezing Terminal
+- **Issue**: Seeking indicator as a message with spinner caused constant re-renders
+- **Solution**: Move seeking status to input area status line (bottom-right)
+- **Key**: Never put animated content in the message history
+
+#### Problem 2: Reasoning Content Appearing in Wrong Location
+- **Issue**: `updateCurrentMessage()` was finding OLD reasoning messages from previous queries
+- **Root Cause**: It searched for ANY message with role "reasoning" from the end
+- **Solution**: Create empty placeholder messages immediately after labels
+```go
+// When starting reasoning
+m.addReasoningLabel()
+// Add empty reasoning message immediately after label
+m.messages = append(m.messages, Message{
+    Role:      "reasoning",
+    Content:   "",
+    Timestamp: time.Now(),
+})
+```
+
+#### Problem 3: Assistant Content on Wrong Line
+- **Issue**: White dot (●) appeared on separate line from content
+- **Solution**: Track `lastRole` in rendering and handle first line specially
+```go
+if i == 0 && lastRole == "assistant-label" {
+    // First line after assistant label - no padding
+    content.WriteString(line)
+} else {
+    // Subsequent lines get padding
+    content.WriteString("  " + line)
+}
+```
+
+#### Problem 4: Viewport Height Calculation
+- **Issue**: Content cut off at bottom when scrolling
+- **Solution**: Dynamic footer height calculation with proper padding
+```go
+footerHeight := 10  // Base height
+if m.autocompleteActive && len(m.autocompleteMatches) > 0 {
+    footerHeight += min(len(m.autocompleteMatches), 5) + 2
+}
+m.viewport.Height = msg.Height - footerHeight
+```
+
+#### Problem 5: Text Color Inconsistency
+- **Issue**: Reasoning text color changed partway through
+- **Solution**: Apply style to ENTIRE padded line, not just content
+```go
+// BAD - style might not apply to padding
+content.WriteString("  " + ReasoningContentStyle.Render(line))
+
+// GOOD - style applies to everything
+paddedLine := "  " + line
+content.WriteString(ReasoningContentStyle.Render(paddedLine))
+```
+
+### Message Update Pattern Best Practices
+
+1. **Always create placeholders**: When adding labels, immediately add empty content message
+2. **Search for empty messages first**: In `updateCurrentMessage()`, prioritize empty placeholders
+3. **Track state carefully**: Use `isReasoning` and `hasContent` flags to manage flow
+4. **Reset accumulator**: Clear `currentContent` when transitioning between message types
+
+### Rendering Order Guarantees
+
+The correct message flow should always be:
+1. User message (▶) with timestamp
+2. "Thinking..." label (● in blue) if reasoning present
+3. Reasoning content (indented, all blue)
+4. Assistant label (● in white) with content on same line
+5. Assistant content (indented on subsequent lines)
+
+### State Management for Streaming
+
+```go
+// Start of conversation
+m.currentContent = ""
+m.isReasoning = false
+m.hasContent = false
+m.accumulatedContent = ""
+
+// When transitioning from reasoning to content
+m.isReasoning = false
+m.finalizeCurrentMessage()
+m.currentContent = ""  // CRITICAL: Reset accumulator
+```
+
+### Debugging Message Issues
+
+1. **Check message array**: Messages persist between queries - ensure you're not updating old ones
+2. **Verify placeholders**: Empty messages should be created for new content
+3. **Track rendering**: Use `lastRole` to handle message transitions
+4. **Test scrolling**: Ensure viewport updates preserve user position
+
 ---
 
-*Last Updated: After implementing autocomplete, markdown rendering, cursor visibility, and fixing all rendering issues*
+*Last Updated: After fixing message ordering, reasoning display, and scrolling issues*
